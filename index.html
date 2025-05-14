@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script type="module">
+        // =====================================================================================
+        // Firebase Initialization - This part remains in HTML due to module imports
+        // =====================================================================================
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+        import { getDatabase, ref, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+        // import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"; // Uncomment if using Firebase Auth
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-kxyl1HBdQB_z2a6zQp8U-sSR3leepEw", // Replace with your actual API key
+            authDomain: "assetit-6ae96.firebaseapp.com",
+            databaseURL: "https://assetit-6ae96-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "assetit-6ae96",
+            storageBucket: "assetit-6ae96.appspot.com", // Corrected storageBucket URL
+            messagingSenderId: "108986650061",
+            appId: "1:108986650061:web:c2511da39ef6bbe00c4884",
+            measurementId: "G-CHD27YQ11H"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+        // const auth = getAuth(app); // Uncomment if using Firebase Auth
+
+        window.firebase = { // Expose necessary Firebase functions globally
+            database, ref, set, onValue, remove, update,
+            // auth, signInWithEmailAndPassword, signOut // Uncomment if using Firebase Auth
+        };
+        // =====================================================================================
+        // End of Firebase Initialization
+        // =====================================================================================
+    </script>
+</head>
+<body class="bg-gray-50">
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-96 fade-in">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">Login</h2>
+                <button onclick="closeLoginModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label for="department" class="block text-sm font-medium text-gray-700">Department</label>
+                    <select id="department" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                        <option value="IT">IT</option>
+                        <option value="ผู้ช่วยผู้บริหาร">ผู้ช่วยผู้บริหาร</option>
+                        <option value="IA">IA</option>
+                        <option value="การตลาด Facebook">การตลาด Facebook</option>
+                        <option value="การตลาด Lazada">การตลาด Lazada</option>
+                        <option value="การตลาด Shopee">การตลาด Shopee</option>
+                        <option value="การตลาด Tiktok">การตลาด Tiktok</option>
+                        <option value="จัดซื้อ">จัดซื้อ</option>
+                        <option value="แบรนด์ดิ้ง">แบรนด์ดิ้ง</option>
+                        <option value="ไลฟ์สด">ไลฟ์สด</option>
+                        <option value="CEO">CEO</option>
+                        <option value="บัญชี">บัญชี</option>
+                        <option value="บุคคล">บุคคล</option>
+                        <option value="ประสานงาน">ประสานงาน </option>
+                        <option value="Content">Content</option>
+                        <option value="Graphic">Graphic</option>
+                        <option value="Sale Admin">Sale Admin</option>
+                        <option value="Support">Support</option>
+                        <option value="Add-Order">Add-Order</option>
+                        <option value="Telesale">Telesale</option>
+                        <option value="รอซ่อม">รอซ่อม</option>
+                        <option value="คลัง Daiki">คลัง Daiki</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="Enter password">
+                </div>
+                <button type="button" onclick="login()" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="flex h-screen">
+        <div id="sidebar" class="sidebar bg-gray-900 text-white w-64 flex flex-col">
+            <div class="p-4 flex items-center space-x-2">
+                <i class="fas fa-laptop-code text-2xl"></i>
+                <span class="logo-text text-xl font-bold">Asset IT</span>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+                <nav class="mt-6">
+                    <div class="px-4 py-2">
+                        <div class="menu-item flex items-center px-4 py-2 rounded-lg hover:bg-red-600 cursor-pointer" onclick="showDashboard()">
+                            <i class="fas fa-tachometer-alt mr-3"></i>
+                            <span class="sidebar-text">Dashboard</span>
+                        </div>
+                    </div>
+                    <div class="px-4 py-2">
+                        <div class="menu-item flex items-center px-4 py-2 rounded-lg hover:bg-red-600 cursor-pointer" onclick="showAssetList()">
+                            <i class="fas fa-boxes mr-3"></i>
+                            <span class="sidebar-text">Asset List</span>
+                        </div>
+                    </div>
+                    <div id="addAssetMenu" class="px-4 py-2 hidden">
+                        <div class="menu-item flex items-center px-4 py-2 rounded-lg hover:bg-red-600 cursor-pointer" onclick="showAddAsset()">
+                            <i class="fas fa-plus-circle mr-3"></i>
+                            <span class="sidebar-text">Add Asset</span>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+            <div class="p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-user-circle text-xl"></i>
+                        <span id="userDepartment" class="sidebar-text"></span>
+                    </div>
+                    <button onclick="logout()" class="text-white hover:text-blue-200">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mainContent" class="main-content flex-1 overflow-y-auto">
+            <div id="dashboardPage" class="p-6 hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
+                    <div class="flex space-x-2">
+                        <button onclick="toggleSidebar()" class="p-2 rounded-md bg-white shadow-sm hover:bg-gray-100">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">Total Assets</p>
+                                <h3 id="totalAssets" class="text-2xl font-bold">0</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <i class="fas fa-boxes text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">ปกติ</p>
+                                <h3 id="activeAssets" class="text-2xl font-bold">0</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                <i class="fas fa-check-circle text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">เสีย</p>
+                                <h3 id="brokenAssets" class="text-2xl font-bold">0</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-red-100 text-red-600">
+                                <i class="fas fa-tools text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">สำรอง</p>
+                                <h3 id="reserveAssets" class="text-2xl font-bold">0</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                                <i class="fas fa-archive text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">หาไม่เจอ</p>
+                                <h3 id="disappearAssets" class="text-2xl font-bold">0</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                                <i class="fas fa-question-circle text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold">Recent Assets</h2>
+                        <button onclick="showAssetList()" class="text-blue-600 hover:text-blue-800 text-sm">View All</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asset ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อเล่น</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Check</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentAssetsTable" class="bg-white divide-y divide-gray-200">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                        <h2 class="text-lg font-semibold mb-4">Assets by Department</h2>
+                        <div id="departmentChartContainer" class="h-64 md:h-80 lg:h-96">  <canvas id="departmentChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                        <h2 class="text-lg font-semibold mb-4">Assets by Status</h2>
+                        <div id="statusChartContainer" class="h-64 md:h-80 lg:h-96"> <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="assetListPage" class="p-6 hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold text-gray-800">Asset List</h1>
+                    <div class="flex space-x-2">
+                        <button id="importBtn" class="hidden px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center">
+                            <i class="fas fa-file-import mr-2"></i> Import
+                        </button>
+                        <button id="addAssetBtn" class="hidden px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center" onclick="showAddAsset()">
+                            <i class="fas fa-plus mr-2"></i> Add Asset
+                        </button>
+                        <button onclick="toggleSidebar()" class="p-2 rounded-md bg-white shadow-sm hover:bg-gray-100">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-6">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                        <div class="mb-4 md:mb-0">
+                            <div class="relative">
+                                <input type="text" id="assetSearch" placeholder="Search assets..." class="pl-10 pr-4 py-2 border rounded-md w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <div class="absolute left-3 top-2.5 text-gray-400">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0">
+                            <select id="departmentFilter" class="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="all">All Departments</option>
+                                <option value="IT">IT</option>
+                                <option value="ผู้ช่วยผู้บริหาร">ผู้ช่วยผู้บริหาร</option>
+                                <option value="IA">IA</option>
+                                <option value="การตลาด Facebook">การตลาด Facebook</option>
+                                <option value="การตลาด Lazada">การตลาด Lazada</option>
+                                <option value="การตลาด Shopee">การตลาด Shopee</option>
+                                <option value="การตลาด Tiktok">การตลาด Tiktok</option>
+                                <option value="จัดซื้อ">จัดซื้อ</option>
+                                <option value="แบรนด์ดิ้ง">แบรนด์ดิ้ง</option>
+                                <option value="ไลฟ์สด">ไลฟ์สด</option>
+                                <option value="CEO">CEO</option>
+                                <option value="บัญชี">บัญชี</option>
+                                <option value="บุคคล">บุคคล</option>
+                                <option value="ประสานงาน">ประสานงาน </option>
+                                <option value="Content">Content</option>
+                                <option value="Graphic">Graphic</option>
+                                <option value="Sale Admin">Sale Admin</option>
+                                <option value="Support">Support</option>
+                                <option value="Add-Order">Add-Order</option>
+                                <option value="Telesale">Telesale</option>
+                                <option value="รอซ่อม">รอซ่อม</option>
+                                <option value="คลัง Daiki">คลัง Daiki</option>
+                            </select>
+                            <select id="statusFilter" class="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="all">All Status</option>
+                                <option value="ปกติ">ปกติ</option>
+                                <option value="สำรอง">สำรอง</option>
+                                <option value="เสีย">เสีย</option>
+                                <option value="หาไม่เจอ">หาไม่เจอ</option>
+                            </select>
+                            <select id="typeFilter" class="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="all">All Types</option>
+                                <option value="PC">Computer</option>
+                                <option value="NB">Notebook</option>
+                                <option value="KB">Keyboard</option>
+                                <option value="MU">Mouse</option>
+                                <option value="MT">Monitor</option>
+                                <option value="PH">Phone</option>
+                                <option value="PT">Printer</option>
+                                <option value="AF">Air filter</option>
+                                <option value="CAM">Camera</option>
+                                <option value="EP">Ear phone</option>
+                                <option value="LT">Light</option>
+                                <option value="MIC">Mike</option>
+                                <option value="PT">Printer</option> <option value="OT">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asset ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อเล่น</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Serial</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assetTable" class="bg-white divide-y divide-gray-200">
+                                </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4 flex justify-between items-center">
+                        <div class="text-sm text-gray-500">
+                            Showing <span id="startItem">0</span> to <span id="endItem">0</span> of <span id="totalItems">0</span> assets
+                        </div>
+                        <div class="flex space-x-2">
+                            <button id="prevPage" class="px-3 py-1 border rounded-md bg-white text-gray-700 disabled:opacity-50" disabled>Previous</button>
+                            <button id="nextPage" class="px-3 py-1 border rounded-md bg-white text-gray-700 disabled:opacity-50" disabled>Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="assetFormPage" class="p-6 hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 id="formTitle" class="text-2xl font-bold text-gray-800">Add New Asset</h1>
+                    <button onclick="toggleSidebar()" class="p-2 rounded-md bg-white shadow-sm hover:bg-gray-100">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <form id="assetForm" class="space-y-4">
+                        <input type="hidden" id="assetId">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="assetName" class="block text-sm font-medium text-gray-700">Asset Name</label>
+                                <input type="text" id="assetName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" required>
+                            </div>
+                            <div>
+                                <label for="assetUsername" class="block text-sm font-medium text-gray-700">Username</label>
+                                <input type="text" id="assetUsername" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                            </div>
+                            <div>
+                                <label for="assetNickname" class="block text-sm font-medium text-gray-700">ชื่อเล่น</label>
+                                <input type="text" id="assetNickname" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                            </div>
+                            <div>
+                                <label for="assetType" class="block text-sm font-medium text-gray-700">Asset Type</label>
+                                <select id="assetType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" required>
+                                    <option value="PC">Computer</option>
+                                    <option value="NB">Notebook</option>
+                                    <option value="KB">Keyboard</option>
+                                    <option value="MU">Mouse</option>
+                                    <option value="MT">Monitor</option>
+                                    <option value="PH">Phone</option>
+                                    <option value="PT">Printer</option>
+                                    <option value="AF">Air filter</option>
+                                    <option value="CAM">Camera</option>
+                                    <option value="EP">Ear phone</option>
+                                    <option value="LT">Light</option>
+                                    <option value="MIC">Mike</option>
+                                    <option value="PT">Printer</option>
+                                    <option value="OT">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="serialNumber" class="block text-sm font-medium text-gray-700">Serial Number</label>
+                                <input type="text" id="serialNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                            </div>
+                            <div>
+                                <label for="assetDepartment" class="block text-sm font-medium text-gray-700">Department</label>
+                                <select id="assetDepartment" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" required>
+                                    <option value="IT">IT</option>
+                                    <option value="ผู้ช่วยผู้บริหาร">ผู้ช่วยผู้บริหาร</option>
+                                    <option value="IA">IA</option>
+                                    <option value="การตลาด Facebook">การตลาด Facebook</option>
+                                    <option value="การตลาด Lazada">การตลาด Lazada</option>
+                                    <option value="การตลาด Shopee">การตลาด Shopee</option>
+                                    <option value="การตลาด Tiktok">การตลาด Tiktok</option>
+                                    <option value="จัดซื้อ">จัดซื้อ</option>
+                                    <option value="แบรนด์ดิ้ง">แบรนด์ดิ้ง</option>
+                                    <option value="ไลฟ์สด">ไลฟ์สด</option>
+                                    <option value="CEO">CEO</option>
+                                    <option value="บัญชี">บัญชี</option>
+                                    <option value="บุคคล">บุคคล</option>
+                                    <option value="ประสานงาน">ประสานงาน</option>
+                                    <option value="Content">Content</option>
+                                    <option value="Graphic">Graphic</option>
+                                    <option value="Sale Admin">Sale Admin</option>
+                                    <option value="Support">Support</option>
+                                    <option value="Add-Order">Add-Order</option>
+                                    <option value="Telesale">Telesale</option>
+                                    <option value="รอซ่อม">รอซ่อม</option>
+                                    <option value="คลัง Daiki">คลัง Daiki</option>
+                                    {/* Additional departments from original list */}
+                                    <option value="ADMIN">ADMIN</option>
+                                    <option value="BRANDING">BRANDING</option>
+                                    <option value="CONTENT">CONTENT</option>
+                                    <option value="COORDINATE">COORDINATE</option>
+                                    <option value="Facebook">Facebook</option>
+                                    <option value="GRAPHIC">GRAPHIC</option>
+                                    <option value="Lazada">Lazada</option>
+                                    <option value="LIVE">LIVE</option>
+                                    <option value="MAKETING">MAKETING</option>
+                                    <option value="PURCHASE">PURCHASE</option>
+                                    <option value="Shopee">Shopee</option>
+                                    <option value="SUPPORT">SUPPORT</option>
+                                    <option value="TELESALE">TELESALE</option>
+                                    <option value="Tiktok">Tiktok</option>
+                                    <option value="ช่างซ่อมบำรุง">ช่างซ่อมบำรุง</option>
+                                    <option value="HR">HR</option>
+                                    <option value="ACCOUNTING">ACCOUNTING</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="specs" class="block text-sm font-medium text-gray-700">Specifications</label>
+                                <textarea id="specs" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"></textarea>
+                            </div>
+                            <div>
+                                <label for="purchaseDate" class="block text-sm font-medium text-gray-700">Purchase Date</label>
+                                <input type="date" id="purchaseDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                            </div>
+                            <div>
+                                <label for="assetStatus" class="block text-sm font-medium text-gray-700">Status</label>
+                                <select id="assetStatus" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" required>
+                                    <option value="ปกติ">ปกติ</option>
+                                    <option value="สำรอง">สำรอง</option>
+                                    <option value="เสีย">เสีย</option>
+                                    <option value="หาไม่เจอ">หาไม่เจอ</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="lastCheck" class="block text-sm font-medium text-gray-700">Last Check Date</label>
+                                <input type="date" id="lastCheck" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
+                                <textarea id="notes" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"></textarea>
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-4 pt-4">
+                            <button type="button" onclick="showAssetList()" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Cancel
+                            </button>
+                            <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Save Asset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="importModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                <div class="bg-white rounded-lg shadow-xl p-6 w-96 fade-in">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-800">Import Assets</h2>
+                        <button onclick="closeImportModal()" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Download Template</label>
+                            <a href="#" onclick="downloadTemplate()" class="text-blue-600 hover:text-blue-800 text-sm flex items-center">
+                                <i class="fas fa-file-excel mr-2"></i> Download Excel Template
+                            </a>
+                        </div>
+                        <div>
+                            <label for="importFile" class="block text-sm font-medium text-gray-700">Upload Excel File</label>
+                            <input type="file" id="importFile" accept=".xlsx, .xls" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        </div>
+                        <div class="flex justify-end space-x-4 pt-4">
+                            <button onclick="closeImportModal()" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Cancel
+                            </button>
+                            <button onclick="importAssets()" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                Import
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js" defer></script>
+</body>
+</html>

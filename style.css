@@ -1,0 +1,313 @@
+/* General body styling */
+body {
+    font-family: 'Inter', sans-serif; /* Example font, ensure it's loaded or use a common one */
+}
+
+/* Sidebar styling */
+.sidebar {
+    transition: all 0.3s ease-in-out;
+}
+.sidebar.collapsed {
+    width: 70px;
+}
+.sidebar.collapsed .sidebar-text,
+.sidebar.collapsed .logo-text {
+    display: none;
+}
+.sidebar.collapsed .menu-item {
+    justify-content: center;
+}
+
+/* Main content area styling */
+.main-content {
+    transition: all 0.3s ease-in-out;
+}
+.main-content.expanded {
+    margin-left: 70px; /* Adjust if sidebar collapsed width changes */
+}
+
+/* Asset card specific styling (if you use cards elsewhere) */
+.asset-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Base badge styling (common for status, type, department) */
+.status-badge,
+.type-badge,
+.department-badge {
+    font-size: 0.75rem; /* 12px */
+    padding: 0.35rem 0.75rem; /* Adjusted padding for a slightly taller, modern look */
+    border-radius: 0.375rem; /* Tailwind's rounded-md, for a modern square-ish look */
+    font-weight: 500;
+    display: inline-block; /* Ensures proper spacing and background */
+    line-height: 1; /* Adjusted for better vertical alignment with new padding */
+    text-align: center;
+    min-width: 70px; /* Minimum width for badges, adjust as needed */
+}
+
+
+/* Dropdown menu styling (if used) */
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+/* Fade-in animation for modals */
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Style for disabled elements to be more visually clear */
+button:disabled,
+select:disabled,
+input:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Status-specific badge colors */
+.status-ปกติ {
+    background-color: #0ac407; /* Tailwind green-100 */
+    color: #ffffff;           /* Tailwind green-800 */
+}
+.status-สำรอง {
+    background-color: #F9CB43; /* Tailwind yellow-100 */
+    color: #92400e;           /* Tailwind yellow-800 */
+}
+.status-เสีย {
+    background-color: #A31D1D; /* Tailwind red-100 */
+    color: #FEF9E1;           /* Tailwind red-800 */
+}
+.status-หาไม่เจอ {
+    background-color: #DDDDDD; /* Tailwind gray-200 */
+    color: #374151;           /* Tailwind gray-700 */
+}
+
+/* Type-specific badge colors (Example colors, you can change these) */
+.type-badge.type-PC {
+    background-color: #A1E3F9; /* Tailwind blue-100 */
+    color: #0f5fb5;           /* Tailwind blue-800 */
+}
+.type-badge.type-AF {
+    background-color: #dbeafe; /* Tailwind blue-100 */
+    color: #1e40af;           /* Tailwind blue-800 */
+}
+.type-badge.type-NB {
+    background-color: #D69ADE; /* Tailwind indigo-100 */
+    color: #441752;           /* Tailwind indigo-800 */
+}
+.type-badge.type-KB {
+    background-color: #FF8000; /* Tailwind violet-100 */
+    color: #FEF3E2;           /* Tailwind violet-800 */
+}
+.type-badge.type-MU {
+    background-color: #fce7f3; /* Tailwind pink-100 */
+    color: #9d174d;           /* Tailwind pink-800 */
+}
+.type-badge.type-MT { /* Monitor */
+    background-color: #d1fae5; /* Tailwind teal-100 (using green for variety) */
+    color: #047857;           /* Tailwind teal-700 */
+}
+.type-badge.type-PH {
+    background-color: #cffafe; /* Tailwind cyan-100 */
+    color: #0e7490;           /* Tailwind cyan-700 */
+}
+.type-badge.type-PR, /* Printer */
+.type-badge.type-PT { /* Also Printer, ensure consistency or differentiate */
+    background-color: #ecfccb; /* Tailwind lime-100 */
+    color: #4d7c0f;           /* Tailwind lime-700 */
+}
+.type-badge.type-CAM {
+    background-color: #fef9c3; /* Tailwind yellow-100 */
+    color: #713f12;           /* Tailwind yellow-800 */
+}
+.type-badge.type-EP {
+    background-color: #f3e8ff; /* Tailwind purple-100 */
+    color: #6b21a8;           /* Tailwind purple-700 */
+}
+.type-badge.type-LT {
+    background-color: #ffedd5; /* Tailwind orange-100 */
+    color: #9a3412;           /* Tailwind orange-700 */
+}
+.type-badge.type-MIC {
+    background-color: #e0f2fe; /* Tailwind sky-100 */
+    color: #0369a1;           /* Tailwind sky-700 */
+}
+
+.type-badge.type-OT, /* Other */
+.type-badge.type-Unknown { /* Fallback for unknown types */
+    background-color: #f3f4f6; /* Tailwind gray-100 */
+    color: #4b5563;           /* Tailwind gray-600 */
+}
+
+
+/* Department-specific badge colors (Example colors, you can change these) */
+/* Helper function to sanitize department names for CSS classes is in JS */
+.department-badge.department-IT {
+    background-color: #ccfbf1; /* Tailwind teal-100 */
+    color: #0f766e;           /* Tailwind teal-700 */
+}
+.department-badge.department-ผู้ช่วยผู้บริหาร {
+    background-color: #fef9c3; /* Tailwind yellow-50 */
+    color: #a16207;           /* Tailwind yellow-700 */
+}
+.department-badge.department-IA {
+    background-color: #fae8ff; /* Tailwind fuchsia-100 */
+    color: #86198f;           /* Tailwind fuchsia-700 */
+}
+.department-badge.department-การตลาดFacebook {
+    background-color: #e0f2fe; /* Tailwind sky-100 */
+    color: #075985;           /* Tailwind sky-700 */
+}
+.department-badge.department-การตลาดLazada {
+    background-color: #ffedd5; /* Tailwind orange-100 */
+    color: #9a3412;           /* Tailwind orange-700 */
+}
+.department-badge.department-การตลาดShopee {
+    background-color: #fee2e2; /* Tailwind red-100 */
+    color: #b91c1c;           /* Tailwind red-700 */
+}
+.department-badge.department-การตลาดTiktok {
+    background-color: #f3e8ff; /* Tailwind purple-100 */
+    color: #6b21a8;           /* Tailwind purple-700 */
+}
+.department-badge.department-จัดซื้อ {
+    background-color: #dcfce7; /* Tailwind green-100 */
+    color: #166534;           /* Tailwind green-700 */
+}
+.department-badge.department-แบรนด์ดิ้ง {
+    background-color: #fce7f3; /* Tailwind pink-100 */
+    color: #9d174d;           /* Tailwind pink-700 */
+}
+.department-badge.department-ไลฟ์สด {
+    background-color: #eef2ff; /* Tailwind indigo-50 */
+    color: #4338ca;           /* Tailwind indigo-700 */
+}
+.department-badge.department-CEO {
+    background-color: #fef2f2; /* Tailwind red-50 */
+    color: #c2410c;           /* Tailwind orange-600 (using orange for CEO) */
+}
+.department-badge.department-บัญชี {
+    background-color: #f0fdf4; /* Tailwind green-50 */
+    color: #15803d;           /* Tailwind green-700 */
+}
+.department-badge.department-บุคคล {
+    background-color: #eff6ff; /* Tailwind blue-50 */
+    color: #1d4ed8;           /* Tailwind blue-700 */
+}
+.department-badge.department-ประสานงาน { /* Note: There was a trailing space in the HTML/JS for "ประสานงาน ", ensure consistency */
+    background-color: #f5f3ff; /* Tailwind violet-50 */
+    color: #7c3aed;           /* Tailwind violet-600 */
+}
+.department-badge.department-Content {
+    background-color: #fffbeb; /* Tailwind yellow-50 */
+    color: #b45309;           /* Tailwind amber-600 */
+}
+.department-badge.department-Graphic {
+    background-color: #fdf2f8; /* Tailwind pink-50 */
+    color: #be185d;           /* Tailwind pink-600 */
+}
+.department-badge.department-SaleAdmin { /* Corrected from Sale Admin to SaleAdmin for consistency if class name is SaleAdmin */
+    background-color: #eef2ff; /* Using indigo-50 */
+    color: #4338ca;           /* Using indigo-700 */
+}
+.department-badge.department-Support {
+    background-color: #f0f9ff; /* Using sky-50 */
+    color: #0ea5e9;           /* Using sky-500 */
+}
+.department-badge.department-AddOrder { /* Corrected from Add-Order to AddOrder */
+    background-color: #fdf4ff; /* Using fuchsia-50 */
+    color: #a21caf;           /* Using fuchsia-600 */
+}
+.department-badge.department-Telesale {
+    background-color: #fff1f2; /* Using rose-50 */
+    color: #e11d48;           /* Using rose-600 */
+}
+.department-badge.department-รอซ่อม {
+    background-color: #fefce8; /* Using yellow-50 */
+    color: #ca8a04;           /* Using yellow-500 */
+}
+.department-badge.department-คลังDaiki {
+    background-color: #f7fee7; /* Using lime-50 */
+    color: #65a30d;           /* Using lime-600 */
+}
+.department-badge.department-ADMIN {
+    background-color: #f8fafc; /* slate-50 */
+    color: #475569; /* slate-600 */
+}
+.department-badge.department-BRANDING {
+    background-color: #fdf2f8; /* pink-50 */
+    color: #db2777; /* pink-600 */
+}
+.department-badge.department-CONTENT { /* Already have .department-Content, ensure consistency */
+    background-color: #fffbeb;
+    color: #b45309;
+}
+.department-badge.department-COORDINATE {
+    background-color: #f5f3ff;
+    color: #7c3aed;
+}
+.department-badge.department-Facebook { /* Already have .department-การตลาดFacebook */
+    background-color: #e0f2fe;
+    color: #075985;
+}
+.department-badge.department-GRAPHIC { /* Already have .department-Graphic */
+    background-color: #fdf2f8;
+    color: #be185d;
+}
+.department-badge.department-Lazada { /* Already have .department-การตลาดLazada */
+    background-color: #ffedd5;
+    color: #9a3412;
+}
+.department-badge.department-LIVE { /* Already have .department-ไลฟ์สด */
+    background-color: #eef2ff;
+    color: #4338ca;
+}
+.department-badge.department-MAKETING { /* Generic Marketing, consider if more specific classes are better */
+    background-color: #ecfdf5; /* emerald-50 */
+    color: #059669; /* emerald-600 */
+}
+.department-badge.department-PURCHASE { /* Already have .department-จัดซื้อ */
+    background-color: #dcfce7;
+    color: #166534;
+}
+.department-badge.department-Shopee { /* Already have .department-การตลาดShopee */
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+.department-badge.department-SUPPORT { /* Already have .department-Support */
+    background-color: #f0f9ff;
+    color: #0ea5e9;
+}
+.department-badge.department-TELESALE { /* Already have .department-Telesale */
+    background-color: #fff1f2;
+    color: #e11d48;
+}
+.department-badge.department-Tiktok { /* Already have .department-การตลาดTiktok */
+    background-color: #f3e8ff;
+    color: #6b21a8;
+}
+.department-badge.department-ช่างซ่อมบำรุง {
+    background-color: #f1f5f9; /* slate-100 */
+    color: #1e293b;           /* slate-800 */
+}
+.department-badge.department-HR { /* Already have .department-บุคคล */
+    background-color: #eff6ff;
+    color: #1d4ed8;
+}
+.department-badge.department-ACCOUNTING { /* Already have .department-บัญชี */
+    background-color: #f0fdf4;
+    color: #15803d;
+}
+
+
+/* Add more department styles as needed */
+.department-badge.department-Unknown, /* Fallback for unknown departments */
+.department-badge:not([class*="department-"]) { /* Default if no specific class matches */
+    background-color: #e5e7eb; /* Tailwind gray-200 */
+    color: #374151;           /* Tailwind gray-700 */
+}
