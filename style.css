@@ -219,9 +219,9 @@ input:disabled {
     background-color: #f0f9ff; /* Using sky-50 */
     color: #0ea5e9;           /* Using sky-500 */
 }
-.department-badge.department-AddOrder { /* Corrected from Add-Order to AddOrder */
-    background-color: #fdf4ff; /* Using fuchsia-50 */
-    color: #a21caf;           /* Using fuchsia-600 */
+.department-badge.department-Add-Order { /* Corrected from Add-Order to AddOrder */
+    background-color: #E8C999; /* Using fuchsia-50 */
+    color: #8E1616;           /* Using fuchsia-600 */
 }
 .department-badge.department-Telesale {
     background-color: #fff1f2; /* Using rose-50 */
@@ -308,6 +308,6 @@ input:disabled {
 /* Add more department styles as needed */
 .department-badge.department-Unknown, /* Fallback for unknown departments */
 .department-badge:not([class*="department-"]) { /* Default if no specific class matches */
-    background-color: #e5e7eb; /* Tailwind gray-200 */
-    color: #374151;           /* Tailwind gray-700 */
+    background-color: #393E46; /* Tailwind gray-200 */
+    color: #222831;           /* Tailwind gray-700 */
 }

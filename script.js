@@ -531,7 +531,7 @@ function getTypeName(typeCode) {
     const types = {
         'PC': 'Computer', 'NB': 'Notebook', 'KB': 'Keyboard',
         'MU': 'Mouse', 'MT': 'Monitor',
-        'PH': 'Phone', 'PR': 'Printer', 'OT': 'Other', 
+        'PH': 'Phone', 'PT': 'Printer', 'OT': 'Other', 
         'AF': 'Air filter', 'CAM': 'Camera', 'EP': 'Ear phone',
         'LT': 'Light', 'MIC': 'Mike'
     };
